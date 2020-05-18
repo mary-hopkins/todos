@@ -1,19 +1,10 @@
-// import from NON DOM scripts 
-    // populateProject(project) to load all todos from project
-    // populateList(list) for weird home pg lists
-    // local storage stuff
-    // pull info function ---> send to Todo
-// 
-// create edit forms that autofill with info
-//
-/*
-*/
 
 // DOM function to create Todo form
 function createTodoFormDOM() {
     
     let formDiv = document.createElement('div');
     formDiv.classList.add('formDiv');
+
 
     let titleLabel = document.createElement('label');
     titleLabel.setAttribute("for", "title");
@@ -95,44 +86,57 @@ function createTodoFormDOM() {
     formDiv.appendChild(document.createElement('br'));
 
     let newTodoSubmitBtn = document.createElement('button');
-    newTodoSubmitBtn.setAttribute("id", "newTodosubmit");
+    newTodoSubmitBtn.classList.add("newTodosubmit");
     newTodoSubmitBtn.setAttribute("type", "button");
     newTodoSubmitBtn.innerHTML = "Submit";
     formDiv.appendChild(newTodoSubmitBtn);
+
+    let cancelBtn = document.createElement('button');
+    cancelBtn.setAttribute("type", "button");
+    cancelBtn.classList.add('cancel-btn');
+    cancelBtn.innerHTML = "Cancel";
+    formDiv.appendChild(cancelBtn);
 
     return formDiv;
 }
 
 // DOM function to create todo
 function createTodoDOM(todo) {
+    let index = todo.getTodoId();
+    
     let todoDiv = document.createElement('div');
     todoDiv.classList.add("todo");
 
-    let projectTitle = document.createElement('h3');
-    projectTitle.innerHTML = todo.getTitle();
-    todoDiv.appendChild(projectTitle);
+    let todoTitle = document.createElement('h3');
+    todoTitle.innerHTML = todo.getTitle();
+    todoDiv.appendChild(todoTitle);
+
+    // will delete once project complete
+    let idblock = document.createElement('h3');
+    idblock.innerHTML = `Todo Id = ${todo.getTodoId()}`;
+    todoDiv.appendChild(idblock);
 
     let due_date = document.createElement('p');
     due_date.innerHTML = `Due: ${todo.getdueDate()}`;
     todoDiv.appendChild(due_date);
 
-    let projectDescription = document.createElement('p');
-    projectDescription.classList.add('description');
-    projectDescription.classList.add('hidden');
-    projectDescription.innerHTML = todo.getDescription();
-    todoDiv.appendChild(projectDescription);
+    let todoDescription = document.createElement('p');
+    todoDescription.classList.add('description');
+    todoDescription.classList.add('hidden');
+    todoDescription.innerHTML = todo.getDescription();
+    todoDiv.appendChild(todoDescription);
 
-    let projectNotes = document.createElement('p');
-    projectNotes.classList.add('notes');
-    projectNotes.classList.add('hidden');
-    projectNotes.innerHTML = todo.getNotes();
-    todoDiv.appendChild(projectNotes);
+    let todoNotes = document.createElement('p');
+    todoNotes.classList.add('notes');
+    todoNotes.classList.add('hidden');
+    todoNotes.innerHTML = todo.getNotes();
+    todoDiv.appendChild(todoNotes);
 
-    let projectPriority = document.createElement('p');
-    projectPriority.classList.add('priority');
-    projectPriority.classList.add('hidden');
-    projectPriority.innerHTML = `Priority: ${todo.getPriority()}`;
-    todoDiv.appendChild(projectPriority);
+    let todoPriority = document.createElement('p');
+    todoPriority.classList.add('priority');
+    todoPriority.classList.add('hidden');
+    todoPriority.innerHTML = `Priority: ${todo.getPriority()}`;
+    todoDiv.appendChild(todoPriority);
 
     let btn_holder = document.createElement('div');
     btn_holder.classList.add('btn-holder');
@@ -140,11 +144,14 @@ function createTodoDOM(todo) {
     let edit_btn = document.createElement('button');
     edit_btn.innerHTML = 'Edit';
     edit_btn.setAttribute("type", "button");
+    edit_btn.classList.add('edit-btn');
     btn_holder.appendChild(edit_btn);
 
     let delete_btn = document.createElement('button');
     delete_btn.innerHTML = 'Delete';
     delete_btn.setAttribute("type", "button");
+    delete_btn.setAttribute("data-num", index);
+    delete_btn.classList.add("delete-btn");
     btn_holder.appendChild(delete_btn);
 
     let mini_btn = document.createElement('button');
@@ -153,89 +160,17 @@ function createTodoDOM(todo) {
     mini_btn.innerHTML = '&#8593';
     btn_holder.appendChild(mini_btn);
 
+    let completed_btn = document.createElement('button');
+    completed_btn.innerHTML = todo.getCompletedStatus();
+    completed_btn.setAttribute("type", "button");
+    completed_btn.setAttribute("data-num", index);
+    completed_btn.classList.add('complete-btn');
+    btn_holder.appendChild(completed_btn);
+
     todoDiv.appendChild(btn_holder);
 
 
     return todoDiv;
-}
-
-// DOM HOME function to create aside 
-function createDefaultProjectDOM() {
-    
-    let aside = document.createElement('aside');
-    aside.classList.add("defaultProject");
-    
-    let projectTitle = document.createElement('h2');
-    projectTitle.innerHTML = "Default Project";
-    aside.appendChild(projectTitle);
-    // will return an array of todo objects
-    asideTodos = populateProject(defaultList);
-    for (let i = 0; i < asideTodos.length; i++) {
-        let todo = createTodoDOM(aside[i], i);
-        aside.appendChild(todo);
-    }
-    return aside;
-}
-// DOM function to validate form input
-function validateTodoForm() {
-    let titleInput = document.querySelector('#title');
-    let dueDateInput = document.querySelector('#dueDate');
-    let priorityInput = document.querySelector('#priority');
-    
-    if (titleInput.value == "") {
-        console.log("Title cannot be blank!");
-        return false;
-    } else if (dueDateInput.value == "") {
-        console.log("Please choose a Due Date");
-        return false;
-    } else if (priorityInput.value == "") {
-        console.log('Please set a Priority (1-5)');
-        return false;
-    } else {
-        return true;
-    }
-}
-
-// Function to handle submit for new todo form
-function submitNewTodo() {
-    if (validateTodoForm()) {
-        let newTodo = pullNewTodoValues();
-        let aside = document.querySelector('aside'); // will go away
-        let newTodoDOM = createTodoDOM(newTodo); // will go away
-        aside.appendChild(newTodoDOM); // will go away
-        toggleCreateTodoForm();
-        //saveNewTodo(newTodo); --> local storage
-        // reset page to reload from local storage
-        return true;
-    } else {
-        return false;
-    }
-}
-
-// Function to pull new Todo values from form
-function pullNewTodoValues() {
-    let titleInput = document.querySelector('#title');
-    let dueDateInput = document.querySelector('#dueDate');
-    let priorityInput = document.querySelector('#priority');
-    let descriptionInput = document.querySelector('#description');
-    let notesInput = document.querySelector('#notes');
-    
-    title = titleInput.value;
-    dueDate = dueDateInput.value;
-    priority = priorityInput.value;
-    description = descriptionInput.value;
-    notes = notesInput.value;
-
-    let newTodo = Todo(title, description, dueDate, priority, notes);
-    return newTodo;
-}
-
-// DOM HOME function to create DueSoonList
-function createDueSoonListDOM() {
-
-}
-// DOM HOME function to create highpriorityList
-function createHighPriorityListDOM() {
 }
 
 // DOM function to toggle visibility
@@ -278,42 +213,23 @@ function toggleCreateTodoForm() {
     }
 }
 
-// factory function to create todo
-const Todo = (title, description, dueDate, priority, notes) => {
+  //on delete remove book
+  function attachButtonevents() {
     
-    // functions to return useful shit
-    const getTitle = () => title;
-    const getdueDate = () => dueDate;
-    const getPriority = () => priority;
-    const getDescription = () => description;
-    const getNotes = () => notes;
+    let spanButtons = document.querySelectorAll('.book_span');
+    spanButtons.forEach((item) => {
+        item.addEventListener('click', function (e) {
+            bookArr[e.target.dataset.num].readval = item.textContent == 'yes' ? 'no' : 'yes';
+            setLocalstorage();
+        })
+    })
+  }
 
 
-    // Functions to change the shit
-    const setTitle = string => {
-        title = string;
-    }
-    const setdueDate = date => {
-        dueDate = date;
-    }
-    const setDescription = string => {
-        description = string;
-    }
-    const setPriority = number => {
-        priority = number;
-    }
-    const setNotes = string => {
-        notes = string;
-    }
-
-    return { getTitle, getdueDate, getPriority, getDescription, getNotes, setTitle, setdueDate, setDescription, setPriority, setNotes }
-
-}
+/////////////////////
 
 export {
-    Todo,
-    createTodoDOM,
     toggleTodo,
     toggleCreateTodoForm,
-    submitNewTodo
+    createTodoDOM
 }
