@@ -1,6 +1,6 @@
 import {
     createTodoDOM
-} from './DOMstuff.js'
+} from './DOMtodo.js'
 
 import {
     setLocalstorage,
@@ -21,7 +21,8 @@ function createDueSoonListDOM() {
     let dueSoonTitle = document.createElement('h2');
     dueSoonTitle.innerHTML = "ToDos Due in the next 7 days";
 
-    dueSoonTodos = populateList(dueSoonList);
+    let dueSoonList = "dueSoon";
+    let dueSoonTodos = populateList(dueSoonList);
     for (let i = 0; i < dueSoonTodos.length; i++) {
         let currentObject = dueSoonTodos[i];
         let currentTodo = objectToTodo(currentObject);   
@@ -47,7 +48,7 @@ function createGeneralListDOM() {
 
     setLocalstorage();
     
-    todosArray = (localStorage.getItem('todos') ? JSON.parse(localStorage.getItem('todos')) : []);
+    let general = "general";
     let asideTodos = populateList(general); // will go thru project switchboard oneday
     
     for (let i = 0; i < asideTodos.length; i++) {

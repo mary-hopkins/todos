@@ -1,28 +1,32 @@
 ///// TO DO LIST /////
 
 /// TODAY ///
-//// function to delete a Todo from the DOM
-//// event listener for complete
-//// function to change completeStatus
+// Populate list --> priority
+// all Index moments for Projects
+// make DOMproject.js for all project moments.
 
 /// Today ///
 //// Edit event listeners
-// Add Project dropdown to forms
-// edit forms that prepopulate info
-// edit function to change attributes and save them
+//// Add Project dropdown to forms
+//// edit forms that prepopulate info
+//// edit function to change attributes and save them
 // Populate List --> priority, dueSoon
 
 /////  FUTURE //////
     // Adding Projects.... :(
-    // populateList(list) for weird home pg lists
+    // function to dynamicaly add projects to create/edit todo forms
     // 
     // 
 // FAR FUTURE
     // projects tab
     // completed tab
 
-
+//// Refactor ////
+// classList.add("foo", "bar");
+//////// bugs ///////
+// edit/create new with form toggles h2 is flipped
 /*
+
 */
 
 import {
@@ -33,13 +37,15 @@ import {
 
 import { 
     toggleTodo, 
-    toggleCreateTodoForm
-} from './DOMstuff.js';
+    toggleCreateTodoForm,
+    toggleEditTodoForm
+} from './DOMtodo.js';
 
 import {
     submitNewTodo,
     deleteTodo,
-    toggleCompleteTodo
+    toggleCompleteTodo,
+    editTodo
 } from './NonDomStuff.js'
 
 // "title", "description", "dueDate", "priority", "notes", "completeStatus", "todoId"
@@ -58,6 +64,7 @@ function addTodoEventListeners() {
 
     // Delete btns
     let delete_btns = document.querySelectorAll('.delete-btn');
+    
     for (var j = 0; j < delete_btns.length; j++) {
         let current_btn = delete_btns[j];
         current_btn.addEventListener('click', deleteTodo, false);
@@ -74,14 +81,18 @@ function addTodoEventListeners() {
     let edit_btns = document.querySelectorAll('.edit-btn');
     for (var j = 0; j < edit_btns.length; j++) {
         let current_btn = edit_btns[j];
-        current_btn.addEventListener('click', testMe, false);
+        current_btn.addEventListener('click', function(e) {
+            toggleEditTodoForm(e);
+            addEditFormEventListeners();
+            addTodoEventListeners();
+        }, false);
     }
 
     // reveal form btns
     let todoCreateNewBtn = document.querySelector("#createTodoForm");
     todoCreateNewBtn.addEventListener('click', function(){
         toggleCreateTodoForm();
-        addFormEventListeners();
+        addNewFormEventListeners();
         addTodoEventListeners();
     }, false);
     
@@ -90,8 +101,8 @@ function addTodoEventListeners() {
     
 }
 
-function addFormEventListeners() {
-    // form submit btns
+function addNewFormEventListeners() {
+    // New form submit btns
     let todoCreateNewSubmitBtn = document.querySelector('.newTodosubmit');
     todoCreateNewSubmitBtn.addEventListener('click', function() {
         if (submitNewTodo()) {
@@ -100,9 +111,22 @@ function addFormEventListeners() {
     }, false);
 
     // Cancel new/edit form btn
-    let cancelBtn = document.querySelector('.cancel-btn');
+    let cancelBtn = document.querySelector('.newTodoCancelBtn');
     cancelBtn.addEventListener('click', function() {
         toggleCreateTodoForm();
+        addTodoEventListeners();
+    }, false);
+}
+
+function addEditFormEventListeners() {
+    //Edit form submit btns
+    let todoEditSubmitBtn = document.querySelector('.editTodosubmit');
+    todoEditSubmitBtn.addEventListener('click', editTodo, false);
+
+    // Cancel edit form btn
+    let cancelEditBtn = document.querySelector('.editTodoCancelBtn');
+    cancelEditBtn.addEventListener('click', function(e) {
+        toggleEditTodoForm(e);
         addTodoEventListeners();
     }, false);
 }
@@ -114,9 +138,9 @@ function testMe() {
 
 window.addEventListener('load', () => {
     base.appendChild(createGeneralListDOM());
-    //base.appendChild(createDueSoonListDOM());
+    base.appendChild(createDueSoonListDOM());
     //base.appendChild(createHighPriorityListDOM());
     addTodoEventListeners();
-    //window.onresize();
+    
 });
 

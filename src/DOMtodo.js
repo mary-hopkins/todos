@@ -1,10 +1,16 @@
+import {
+    findTodoInTodosArray
+} from './NonDomStuff'
+
+
+let todosArray = (localStorage.getItem('todos') ? JSON.parse(localStorage.getItem('todos')) : []);
+
 
 // DOM function to create Todo form
 function createTodoFormDOM() {
     
     let formDiv = document.createElement('div');
     formDiv.classList.add('formDiv');
-
 
     let titleLabel = document.createElement('label');
     titleLabel.setAttribute("for", "title");
@@ -44,7 +50,6 @@ function createTodoFormDOM() {
     let descriptionInput = document.createElement('textarea');
     descriptionInput.setAttribute("id", "description");
     descriptionInput.setAttribute("name", "description");
-    //descriptionInput.setAttribute("required", "");
     descriptionInput.setAttribute("rows", "4");
     descriptionInput.setAttribute("cols", "50");
     descriptionInput.setAttribute("maxlength", "140");
@@ -61,7 +66,6 @@ function createTodoFormDOM() {
     let notesInput = document.createElement('textarea');
     notesInput.setAttribute("id", "notes");
     notesInput.setAttribute("name", "notes");
-    //notesInput.setAttribute("required", "");
     notesInput.setAttribute("rows", "4");
     notesInput.setAttribute("cols", "50");
     notesInput.setAttribute("maxlength", "140");
@@ -85,6 +89,36 @@ function createTodoFormDOM() {
     formDiv.appendChild(document.createElement('br'));
     formDiv.appendChild(document.createElement('br'));
 
+    let projectLabel = document.createElement('label');
+    projectLabel.setAttribute("for", "project");
+    projectLabel.innerHTML = "Project:";
+    formDiv.appendChild(projectLabel);
+    formDiv.appendChild(document.createElement('br'));
+    
+    let projectInput = document.createElement('select');
+    projectInput.setAttribute("id", "project");
+    projectInput.setAttribute("name", "project");
+    // options will eventually be DYNAMIC
+    let optionGeneral = document.createElement('option');
+    optionGeneral.setAttribute("value", "general");
+    optionGeneral.innerHTML = "General";
+    projectInput.appendChild(optionGeneral);
+
+    let optionWedding = document.createElement('option');
+    optionWedding.setAttribute("value", "wedding");
+    optionWedding.innerHTML = "Wedding";
+    projectInput.appendChild(optionWedding);
+
+    let optionSampleApp = document.createElement('option');
+    optionSampleApp.setAttribute("value", "sampleApp");
+    optionSampleApp.innerHTML = "Sample App";
+    projectInput.appendChild(optionSampleApp);
+    ///// End what will oneday be a function
+
+    formDiv.appendChild(projectInput);
+    formDiv.appendChild(document.createElement('br'));
+    formDiv.appendChild(document.createElement('br'));
+
     let newTodoSubmitBtn = document.createElement('button');
     newTodoSubmitBtn.classList.add("newTodosubmit");
     newTodoSubmitBtn.setAttribute("type", "button");
@@ -93,7 +127,140 @@ function createTodoFormDOM() {
 
     let cancelBtn = document.createElement('button');
     cancelBtn.setAttribute("type", "button");
-    cancelBtn.classList.add('cancel-btn');
+    cancelBtn.classList.add('newTodoCancelBtn');
+    cancelBtn.innerHTML = "Cancel";
+    formDiv.appendChild(cancelBtn);
+
+    return formDiv;
+}
+
+// Function to make Edit form for todo
+function editTodoFormDOM(e) {
+    
+    let formDiv = document.createElement('div');
+    formDiv.classList.add('formDiv');
+
+    let titleLabel = document.createElement('label');
+    titleLabel.setAttribute("for", "title");
+    titleLabel.innerHTML = "Title:";
+    formDiv.appendChild(titleLabel);
+    formDiv.appendChild(document.createElement('br'));
+
+    let titleInput = document.createElement('input');
+    titleInput.setAttribute("id", "title");
+    titleInput.setAttribute("type", "text");
+    titleInput.setAttribute("maxlength", "50");
+    titleInput.setAttribute("required", "");
+    titleInput.value = `${e.title}`;
+    formDiv.appendChild(titleInput);
+    formDiv.appendChild(document.createElement('br'));
+    formDiv.appendChild(document.createElement('br'));
+
+    let dueDateLabel = document.createElement('label');
+    dueDateLabel.setAttribute("for", "dueDate");
+    dueDateLabel.innerHTML = "Due Date:";
+    formDiv.appendChild(dueDateLabel);
+    formDiv.appendChild(document.createElement('br'));
+
+    let dueDateInput = document.createElement('input');
+    dueDateInput.setAttribute("id", "dueDate");
+    dueDateInput.setAttribute("type", "date");
+    dueDateInput.setAttribute("required", "");
+    dueDateInput.value = `${e.dueDate}`;
+    formDiv.appendChild(dueDateInput);
+    formDiv.appendChild(document.createElement('br'));
+    formDiv.appendChild(document.createElement('br'));
+    let descriptionLabel = document.createElement('label');
+    descriptionLabel.setAttribute("for", "description");
+    descriptionLabel.innerHTML = "Description:";
+    formDiv.appendChild(descriptionLabel);
+    formDiv.appendChild(document.createElement('br'));
+
+    let descriptionInput = document.createElement('textarea');
+    descriptionInput.setAttribute("id", "description");
+    descriptionInput.setAttribute("name", "description");
+    descriptionInput.setAttribute("rows", "4");
+    descriptionInput.setAttribute("cols", "50");
+    descriptionInput.setAttribute("maxlength", "140");
+    descriptionInput.value = `${e.description}`;
+    formDiv.appendChild(descriptionInput);
+    formDiv.appendChild(document.createElement('br'));
+    formDiv.appendChild(document.createElement('br'));
+
+    let notesLabel = document.createElement('label');
+    notesLabel.setAttribute("for", "notes");
+    notesLabel.innerHTML = "Notes:";
+    formDiv.appendChild(notesLabel);
+    formDiv.appendChild(document.createElement('br'));
+
+    let notesInput = document.createElement('textarea');
+    notesInput.setAttribute("id", "notes");
+    notesInput.setAttribute("name", "notes");
+    notesInput.setAttribute("rows", "4");
+    notesInput.setAttribute("cols", "50");
+    notesInput.setAttribute("maxlength", "140");
+    notesInput.value = `${e.notes}`;
+    formDiv.appendChild(notesInput);
+    formDiv.appendChild(document.createElement('br'));
+    formDiv.appendChild(document.createElement('br'));
+
+    let priorityLabel = document.createElement('label');
+    priorityLabel.setAttribute("for", "priority");
+    priorityLabel.innerHTML = "Priority:";
+    formDiv.appendChild(priorityLabel);
+    formDiv.appendChild(document.createElement('br'));
+
+    let priorityInput = document.createElement('input');
+    priorityInput.setAttribute("id", "priority");
+    priorityInput.setAttribute("type", "number");
+    priorityInput.setAttribute("max", "5");
+    priorityInput.setAttribute("min", "1");
+    priorityInput.setAttribute("required", "");
+    priorityInput.value = `${e.priority}`;
+    formDiv.appendChild(priorityInput);
+    formDiv.appendChild(document.createElement('br'));
+    formDiv.appendChild(document.createElement('br'));
+
+    let projectLabel = document.createElement('label');
+    projectLabel.setAttribute("for", "project");
+    projectLabel.innerHTML = "Project:";
+    formDiv.appendChild(projectLabel);
+    formDiv.appendChild(document.createElement('br'));
+    
+    let projectInput = document.createElement('select');
+    projectInput.setAttribute("id", "project");
+    projectInput.setAttribute("name", "project");
+    // options will eventually be DYNAMIC
+    let optionGeneral = document.createElement('option');
+    optionGeneral.setAttribute("value", "general");
+    optionGeneral.innerHTML = "General";
+    projectInput.appendChild(optionGeneral);
+
+    let optionWedding = document.createElement('option');
+    optionWedding.setAttribute("value", "wedding");
+    optionWedding.innerHTML = "Wedding";
+    projectInput.appendChild(optionWedding);
+
+    let optionSampleApp = document.createElement('option');
+    optionSampleApp.setAttribute("value", "sampleApp");
+    optionSampleApp.innerHTML = "Sample App";
+    projectInput.appendChild(optionSampleApp);
+    ///// End what will oneday be a function
+
+    formDiv.appendChild(projectInput);
+    formDiv.appendChild(document.createElement('br'));
+    formDiv.appendChild(document.createElement('br'));
+
+    let newTodoSubmitBtn = document.createElement('button');
+    newTodoSubmitBtn.classList.add("editTodosubmit");
+    newTodoSubmitBtn.setAttribute("type", "button");
+    newTodoSubmitBtn.setAttribute("data-num", e.todoId);
+    newTodoSubmitBtn.innerHTML = "Submit";
+    formDiv.appendChild(newTodoSubmitBtn);
+
+    let cancelBtn = document.createElement('button');
+    cancelBtn.setAttribute("type", "button");
+    cancelBtn.classList.add('editTodoCancelBtn');
     cancelBtn.innerHTML = "Cancel";
     formDiv.appendChild(cancelBtn);
 
@@ -144,6 +311,7 @@ function createTodoDOM(todo) {
     let edit_btn = document.createElement('button');
     edit_btn.innerHTML = 'Edit';
     edit_btn.setAttribute("type", "button");
+    edit_btn.setAttribute('data-num', index);
     edit_btn.classList.add('edit-btn');
     btn_holder.appendChild(edit_btn);
 
@@ -213,23 +381,33 @@ function toggleCreateTodoForm() {
     }
 }
 
-  //on delete remove book
-  function attachButtonevents() {
+// Function to toggle Edit form visibility
+function toggleEditTodoForm(e) {
+    let targetTodoId = e.target.dataset.num;
+    let targetTodoIndex = findTodoInTodosArray(targetTodoId);
+    let targetTodo = todosArray[targetTodoIndex];
+
+
+    let createDiv = document.querySelector('.create');
+    let formSection = document.querySelector('.form');
+    let formSectionTitle = document.createElement('h2');
+    formSectionTitle.innerHTML = "Edit Your Todo";
     
-    let spanButtons = document.querySelectorAll('.book_span');
-    spanButtons.forEach((item) => {
-        item.addEventListener('click', function (e) {
-            bookArr[e.target.dataset.num].readval = item.textContent == 'yes' ? 'no' : 'yes';
-            setLocalstorage();
-        })
-    })
-  }
-
-
-/////////////////////
+    if (formSection.classList.contains("hidden")) {
+        createDiv.classList.add("hidden");
+        formSection.classList.remove("hidden");
+        formSection.appendChild(editTodoFormDOM(targetTodo));
+    } else {
+        createDiv.classList.remove("hidden");
+        formSection.classList.add("hidden");
+        formSection.innerHTML = "";
+        formSection.appendChild(formSectionTitle);
+    }
+}
 
 export {
     toggleTodo,
     toggleCreateTodoForm,
+    toggleEditTodoForm,
     createTodoDOM
 }

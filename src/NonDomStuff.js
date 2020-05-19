@@ -25,12 +25,39 @@ function findTodoInTodosArray(Id) {
     }
 }
 
+// function to edit a todo
+function editTodo(e) {
+    let targetTodoId = e.target.dataset.num;
+    let targetTodoIndex = findTodoInTodosArray(targetTodoId);
+    let targetTodo = todosArray[targetTodoIndex];
+
+    if (validateTodoForm) {
+        let titleInput = document.querySelector('#title');
+        let dueDateInput = document.querySelector('#dueDate');
+        let priorityInput = document.querySelector('#priority');
+        let descriptionInput = document.querySelector('#description');
+        let notesInput = document.querySelector('#notes');
+
+        targetTodo.title = titleInput.value;
+        targetTodo.dueDate = dueDateInput.value;
+        targetTodo.description = descriptionInput.value;
+        targetTodo.priority = priorityInput.value;
+        targetTodo.notes = notesInput.value;
+    } else {}
+    setLocalstorage();
+    location.reload();
+}
+
 // function to delete todo from TodosArray
 function deleteTodo(e) {
-    let targetTodoId = e.target.dataset.num;
-    let targetTodo = findTodoInTodosArray(targetTodoId);
-    todosArray.splice(targetTodo, 1);
-    setLocalstorage();
+    if (todosArray.length == 1) {
+        localStorage.removeItem('todos');
+    } else { 
+        let targetTodoId = e.target.dataset.num;
+        let targetTodo = findTodoInTodosArray(targetTodoId);
+        todosArray.splice(targetTodo, 1);
+        setLocalstorage();
+    }
     location.reload();
 }
 
@@ -104,13 +131,23 @@ const Todo = (title, description, dueDate, priority, notes, completeStatus, todo
 
 // function to pull list objects from todosArray
 function populateList(list) {
-    
     switch (list) {
-        case 'general':
-            //All project --> general
+        case "general":
+            todosArray = (localStorage.getItem('todos') ? JSON.parse(localStorage.getItem('todos')) : []);
+            return todosArray;
             break;
-        case 'dueSoonList':
-            //All with duedate date.now  + 7days
+        case "dueSoon":
+            let dueSoonArray = [];
+            let sevenDaysFromNow = new Date();
+            sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
+                
+            for (var i = 0; i < todosArray.length; i++) {
+                let currentDueDate = new Date(todosArray[i].dueDate);
+                if (currentDueDate <= sevenDaysFromNow) { 
+                    dueSoonArray.push(todosArray[i]);
+                } else {}
+            }
+            return dueSoonArray;
             break;
         case 'highPriorityList':
             //All 5s and 4s
@@ -218,6 +255,7 @@ export {
     deleteTodo,
     populateList,
     populateProject,
-    toggleCompleteTodo
+    toggleCompleteTodo,
+    editTodo
 
 }
