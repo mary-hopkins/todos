@@ -1,18 +1,15 @@
-import { findTodoInTodosArray, objectToTodo } from "./TodosArray";
-
 import {
-  findProjectTitleFromProjectId,
+  findProjectInProjectsArray,
   shareProjectsArray,
-} from "./ProjectsArray";
+} from "./ProjectsArray.js";
 
-let todosArray = localStorage.getItem("todos")
-  ? JSON.parse(localStorage.getItem("todos"))
-  : [];
+import { getTodosForProject } from "./DOMtodo.js";
 
-// DOM function to create Todo form
-function createTodoFormDOM() {
+// New Project form
+function createProjectFormDOM() {
   let formDiv = document.createElement("div");
   formDiv.classList.add("formDiv");
+
   let titleLabel = document.createElement("label");
   titleLabel.setAttribute("for", "title");
   titleLabel.innerHTML = "Title:";
@@ -90,50 +87,23 @@ function createTodoFormDOM() {
   formDiv.appendChild(document.createElement("br"));
   formDiv.appendChild(document.createElement("br"));
 
-  let projectLabel = document.createElement("label");
-  projectLabel.setAttribute("for", "project");
-  projectLabel.innerHTML = "Project:";
-  formDiv.appendChild(projectLabel);
-  formDiv.appendChild(document.createElement("br"));
-
-  let projectInput = document.createElement("select");
-  projectInput.setAttribute("id", "project");
-  projectInput.setAttribute("name", "project");
-
-  // function to go thru projectsArray and make an option for each one
-  function createProjectOptions() {
-    let projectsArray = shareProjectsArray();
-    for (var i = 0; i < projectsArray.length; i++) {
-      let currentProject = projectsArray[i];
-      let optionBlock = document.createElement("option");
-      optionBlock.setAttribute("value", `${currentProject.title}`);
-      optionBlock.innerHTML = `${currentProject.title}`;
-      projectInput.appendChild(optionBlock);
-    }
-  }
-  createProjectOptions();
-
-  formDiv.appendChild(projectInput);
-  formDiv.appendChild(document.createElement("br"));
-  formDiv.appendChild(document.createElement("br"));
-
-  let newTodoSubmitBtn = document.createElement("button");
-  newTodoSubmitBtn.classList.add("newTodosubmit");
-  newTodoSubmitBtn.setAttribute("type", "button");
-  newTodoSubmitBtn.innerHTML = "Submit";
-  formDiv.appendChild(newTodoSubmitBtn);
+  let newProjectSubmitBtn = document.createElement("button");
+  newProjectSubmitBtn.classList.add("newProjectsubmit");
+  newProjectSubmitBtn.setAttribute("type", "button");
+  newProjectSubmitBtn.innerHTML = "Submit";
+  formDiv.appendChild(newProjectSubmitBtn);
 
   let cancelBtn = document.createElement("button");
   cancelBtn.setAttribute("type", "button");
-  cancelBtn.classList.add("newTodoCancelBtn");
+  cancelBtn.classList.add("newProjectCancelBtn");
   cancelBtn.innerHTML = "Cancel";
   formDiv.appendChild(cancelBtn);
 
   return formDiv;
 }
 
-// Function to make Edit form for todo
-function editTodoFormDOM(e) {
+// Edit Project form
+function editProjectFormDOM(e) {
   let formDiv = document.createElement("div");
   formDiv.classList.add("formDiv");
 
@@ -218,84 +188,59 @@ function editTodoFormDOM(e) {
   formDiv.appendChild(document.createElement("br"));
   formDiv.appendChild(document.createElement("br"));
 
-  let projectLabel = document.createElement("label");
-  projectLabel.setAttribute("for", "project");
-  projectLabel.innerHTML = "Project:";
-  formDiv.appendChild(projectLabel);
-  formDiv.appendChild(document.createElement("br"));
-
-  let projectInput = document.createElement("select");
-  projectInput.setAttribute("id", "project");
-  projectInput.setAttribute("name", "project");
-
-  // function to go thru projectsArray and make an option for each one
-  function createProjectOptions() {
-    let projectsArray = shareProjectsArray();
-    for (var i = 0; i < projectsArray.length; i++) {
-      let currentProject = projectsArray[i];
-      let optionBlock = document.createElement("option");
-      optionBlock.setAttribute("value", `${currentProject.title}`);
-      optionBlock.innerHTML = `${currentProject.title}`;
-      projectInput.appendChild(optionBlock);
-    }
-  }
-  createProjectOptions();
-
-  formDiv.appendChild(projectInput);
-  formDiv.appendChild(document.createElement("br"));
-  formDiv.appendChild(document.createElement("br"));
-
-  let newTodoSubmitBtn = document.createElement("button");
-  newTodoSubmitBtn.classList.add("editTodosubmit");
-  newTodoSubmitBtn.setAttribute("type", "button");
-  newTodoSubmitBtn.setAttribute("data-num", e.todoId);
-  newTodoSubmitBtn.innerHTML = "Submit";
-  formDiv.appendChild(newTodoSubmitBtn);
+  let newProjectSubmitBtn = document.createElement("button");
+  newProjectSubmitBtn.classList.add("editProjectsubmit");
+  newProjectSubmitBtn.setAttribute("type", "button");
+  newProjectSubmitBtn.setAttribute("data-num", e.projectId);
+  newProjectSubmitBtn.innerHTML = "Submit";
+  formDiv.appendChild(newProjectSubmitBtn);
 
   let cancelBtn = document.createElement("button");
   cancelBtn.setAttribute("type", "button");
-  cancelBtn.classList.add("editTodoCancelBtn");
+  cancelBtn.classList.add("editProjectCancelBtn");
   cancelBtn.innerHTML = "Cancel";
   formDiv.appendChild(cancelBtn);
 
   return formDiv;
 }
 
-// DOM function to create todo
-function createTodoDOM(todo) {
-  let index = todo.getTodoId();
+// DOM function to create Project
+function createProjectDOM(project) {
+  let index = project.getProjectId();
 
-  let todoDiv = document.createElement("div");
-  todoDiv.classList.add("todo");
+  let projectDiv = document.createElement("div");
+  projectDiv.classList.add("project");
 
-  let todoTitle = document.createElement("h3");
-  todoTitle.innerHTML = todo.getTitle();
-  todoDiv.appendChild(todoTitle);
+  let projectTitle = document.createElement("h3");
+  projectTitle.innerHTML = project.getTitle();
+  projectDiv.appendChild(projectTitle);
 
   let due_date = document.createElement("p");
-  due_date.innerHTML = `Due: ${todo.getdueDate()}`;
-  todoDiv.appendChild(due_date);
+  due_date.innerHTML = `Due: ${project.getdueDate()}`;
+  projectDiv.appendChild(due_date);
 
-  let todoDescription = document.createElement("p");
-  todoDescription.classList.add("description", "hidden");
-  todoDescription.innerHTML = todo.getDescription();
-  todoDiv.appendChild(todoDescription);
+  let projectDescription = document.createElement("p");
+  projectDescription.classList.add("description", "hidden");
+  projectDescription.innerHTML = project.getDescription();
+  projectDiv.appendChild(projectDescription);
 
-  let todoNotes = document.createElement("p");
-  todoNotes.classList.add("notes", "hidden");
-  todoNotes.innerHTML = todo.getNotes();
-  todoDiv.appendChild(todoNotes);
+  let projectNotes = document.createElement("p");
+  projectNotes.classList.add("notes", "hidden");
+  projectNotes.innerHTML = project.getNotes();
+  projectDiv.appendChild(projectNotes);
 
-  let todoPriority = document.createElement("p");
-  todoPriority.classList.add("priority", "hidden");
-  todoPriority.innerHTML = `Priority: ${todo.getPriority()}`;
-  todoDiv.appendChild(todoPriority);
+  let projectPriority = document.createElement("p");
+  projectPriority.classList.add("priority", "hidden");
+  projectPriority.innerHTML = `Priority: ${project.getPriority()}`;
+  projectDiv.appendChild(projectPriority);
 
-  let todoProject = document.createElement("p");
-  todoProject.classList.add("project", "hidden");
-  todoProject.innerHTML = `Project: ${findProjectTitleFromProjectId(
-    todo.getProjectId()
-  )}`;
+  let todosContainer = document.createElement("div");
+  todosContainer.classList.add("todos-container", "hidden");
+  let todosContainerTitle = document.createElement("h3");
+  todosContainerTitle.innerHTML = `${project.getTitle()} Todos`;
+  todosContainer.appendChild(todosContainerTitle);
+  todosContainer.appendChild(getTodosForProject(project.getProjectId()));
+  projectDiv.appendChild(todosContainer);
 
   let btn_holder = document.createElement("div");
   btn_holder.classList.add("btn-holder");
@@ -304,40 +249,40 @@ function createTodoDOM(todo) {
   edit_btn.innerHTML = "Edit";
   edit_btn.setAttribute("type", "button");
   edit_btn.setAttribute("data-num", index);
-  edit_btn.classList.add("edit-btn");
+  edit_btn.classList.add("project-edit-btn");
   btn_holder.appendChild(edit_btn);
 
   let delete_btn = document.createElement("button");
   delete_btn.innerHTML = "Delete";
   delete_btn.setAttribute("type", "button");
   delete_btn.setAttribute("data-num", index);
-  delete_btn.classList.add("delete-btn");
+  delete_btn.classList.add("project-delete-btn");
   btn_holder.appendChild(delete_btn);
 
   let mini_btn = document.createElement("button");
-  mini_btn.classList.add("minimax");
+  mini_btn.classList.add("projectMinimax");
   mini_btn.setAttribute("type", "button");
   mini_btn.innerHTML = "&#8593";
   btn_holder.appendChild(mini_btn);
 
   let completed_btn = document.createElement("button");
-  completed_btn.innerHTML = todo.getCompletedStatus();
+  completed_btn.innerHTML = project.getCompletedStatus();
   completed_btn.setAttribute("type", "button");
   completed_btn.setAttribute("data-num", index);
-  completed_btn.classList.add("complete-btn");
+  completed_btn.classList.add("project-complete-btn");
   btn_holder.appendChild(completed_btn);
 
-  todoDiv.appendChild(btn_holder);
+  projectDiv.appendChild(btn_holder);
 
-  return todoDiv;
+  return projectDiv;
 }
 
 // DOM function to toggle visibility
-function toggleTodo(e) {
+function toggleProject(e) {
   let btnDiv = e.target;
   let btnHolderDiv = btnDiv.parentNode;
-  let todoDiv = btnHolderDiv.parentNode;
-  let searchDivs = todoDiv.children;
+  let projectDiv = btnHolderDiv.parentNode;
+  let searchDivs = projectDiv.children;
 
   for (var i = 0; i < searchDivs.length; i++) {
     var currentElement = searchDivs[i];
@@ -351,8 +296,8 @@ function toggleTodo(e) {
   }
 }
 
-// New Todo Form Visibility
-function CreateTodoForm() {
+// New Project form visibility
+function createProjectForm() {
   let base = document.querySelector("#content");
   base.classList.add("hidden");
 
@@ -364,66 +309,33 @@ function CreateTodoForm() {
   formSection.innerHTML = "";
 
   let formSectionTitle = document.createElement("h2");
-  formSectionTitle.innerHTML = "Create a New Todo!";
+  formSectionTitle.innerHTML = "Create a New Project!";
   formSection.appendChild(formSectionTitle);
-
-  formSection.appendChild(createTodoFormDOM());
+  formSection.appendChild(createProjectFormDOM());
 }
 
-// Edit Todo Form Visibility
-function EditTodoForm(e) {
-  let targetTodoId = e.target.dataset.num;
-  let targetTodoIndex = findTodoInTodosArray(targetTodoId);
-  let targetTodo = todosArray[targetTodoIndex];
+// Edit Project form visibilty
+function editProjectForm(e) {
+  console.log("the toggle fires");
+  let targetProjectId = e.target.dataset.num;
+  let targetProjectIndex = findProjectInProjectsArray(targetProjectId);
+  let targetProject = shareProjectsArray()[targetProjectIndex];
 
   let base = document.querySelector("#content");
-  base.classList.add("hidden");
-
   let createDiv = document.querySelector(".create");
-  createDiv.classList.add("hidden");
-
   let formSection = document.querySelector(".form");
-  formSection.classList.remove("hidden");
-  formSection.innerHTML = "";
-
   let formSectionTitle = document.createElement("h2");
-  formSectionTitle.innerHTML = "Edit Your Todo";
-  formSection.appendChild(formSectionTitle);
+  formSectionTitle.innerHTML = "Edit Your Project";
 
-  formSection.appendChild(editTodoFormDOM(targetTodo));
-}
+  if (formSection.classList.contains("hidden")) {
+    createDiv.classList.add("hidden");
+    base.classList.add("hidden");
 
-function getTodosForProject(id) {
-  let projectId = id;
-  let returnerDiv = document.createElement("div");
-
-  for (var i = 0; i < todosArray.length; i++) {
-    let object = todosArray[i];
-    if (object.projectId == projectId) {
-      let todo = objectToTodo(object);
-      let todoDom = createTodoDOM(todo);
-      returnerDiv.appendChild(todoDom);
-    }
+    formSection.classList.remove("hidden");
+    formSection.innerHTML = "";
+    formSection.appendChild(formSectionTitle);
+    formSection.appendChild(editProjectFormDOM(targetProject));
   }
-  return returnerDiv;
 }
 
-function notAPageReset() {
-  let base = document.querySelector("#content");
-  let createDiv = document.querySelector(".create");
-  let formSection = document.querySelector(".form");
-
-  createDiv.classList.remove("hidden");
-  formSection.classList.add("hidden");
-  base.classList.remove("hidden");
-  formSection.innerHTML = "";
-}
-
-export {
-  toggleTodo,
-  CreateTodoForm,
-  EditTodoForm,
-  createTodoDOM,
-  getTodosForProject,
-  notAPageReset,
-};
+export { toggleProject, createProjectForm, editProjectForm, createProjectDOM };
