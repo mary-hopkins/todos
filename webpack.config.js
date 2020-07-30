@@ -6,6 +6,10 @@ module.exports = {
   devtool: 'inline-source-map',
   devServer: {
     contentBase: './dist',
+    watchOptions: {
+      poll: true
+    },
+    liveReload: true
   },
   output: {
     filename: 'main.js',

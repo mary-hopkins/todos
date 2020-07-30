@@ -1,15 +1,25 @@
-import { loadHomeTab } from "./DOMHomeTab.js";
-import { loadProjectTab } from "./DOMProjectTab.js";
+/*
+rewrite ProjectTab
 
+
+*/
+
+
+
+import { loadHomeTab, loadProjectTab } from "./HomeTab.js";
+import { List } from "./ProjectsAndTodos.js";
 import {
-  addTodoEventListeners,
-  addProjectEventListeners,
   addNavigationEventListeners,
+  runAllDisplayEventListeners,
+  testMe,
+  addCreateNewEventListeners
 } from "./eventListeners.js";
+import { notAPageReset } from "./DOMfunctions.js"
 
 let loadThisTab = "home";
 
 function tabSwitchBoard(tab) {
+  notAPageReset()
   if (tab == "home") {
     loadHomeTab();
     loadThisTab = "home";
@@ -21,20 +31,18 @@ function tabSwitchBoard(tab) {
       tabSwitchBoard("home");
     } else if (loadThisTab == "project") {
       tabSwitchBoard("project");
-    } else if (loadThisTab == "completed") {
-      tabSwitchBoard("completed");
     }
   }
-  tonsOfEventListeners();
+  addCreateNewEventListeners();
+  runAllDisplayEventListeners();
 }
+let listOne = List();
 
-function tonsOfEventListeners() {
-  addTodoEventListeners();
-  addProjectEventListeners();
-  addNavigationEventListeners();
-}
 window.addEventListener("load", () => {
+  listOne.getLocalStorage();
+  addNavigationEventListeners();
+  addCreateNewEventListeners();
   tabSwitchBoard("home");
 });
 
-export { tabSwitchBoard };
+export { tabSwitchBoard, listOne };
