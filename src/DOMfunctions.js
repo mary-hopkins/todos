@@ -115,6 +115,19 @@ function deleteTodo(e) {
   targetProject.deleteTodo(targetTodoId);
   listOne.setLocalStorage();
 }
+function toggleCompleteTodo(e) {
+  console.log(`toggle fired`);
+  let targetProjectId = parseInt(e.target.dataset.project);
+  let targetTodoId = parseInt(e.target.dataset.todo);
+  let project = listOne.findProjectInProjectsArray(targetProjectId);
+  let todo = project.findTodoInTodosArray(targetTodoId);
+  let todoCompleteStatus = todo.getCompleteStatus();
+  console.log(`1 todoCompleteStatus: ${todoCompleteStatus}`);
+  if(todoCompleteStatus) {
+    todo.updateTodoCompleteStatus(false);
+  } else {todo.updateTodoCompleteStatus(true)}
+  listOne.setLocalStorage();
+}
 
 // PROJECTS CRUD
 function submitNewProject() {
@@ -137,6 +150,16 @@ function updateProject(e) {
 function deleteProject(e) {
   let targetProjectId = parseInt(e.target.dataset.project);
   listOne.deleteProject(targetProjectId);
+  listOne.setLocalStorage();
+}
+function toggleCompleteProject(e) {
+  let targetProjectId = parseInt(e.target.dataset.project);
+  let project = listOne.findProjectInProjectsArray(targetProjectId);
+  
+  let projectCompleteStatus = project.getCompleteStatus();
+  if(projectCompleteStatus) {
+    project.updateProjectCompleteStatus(false);
+  } else {project.updateProjectCompleteStatus(true)}
   listOne.setLocalStorage();
 }
 
@@ -590,7 +613,22 @@ function getTodosForProject(id) {
   }
   return returnerDiv;
 }
-
+function getBackgroundColor(priority) {
+  switch (priority) {
+    case 1:
+      return "#bae1ff";
+    case 2:
+      return "#baffc9";
+    case 3:
+      return "#ffffba";
+    case 4:
+      return "#ffdfba";
+    case 5:
+      return "ffb3ba";
+    default:
+      return "white";
+  }
+}
 function displayTodo(todo) {
   let todoId = todo.getTodoId();
   let project = listOne.findProjectInProjectsArray(todo.getProjectId());
@@ -598,6 +636,7 @@ function displayTodo(todo) {
 
   let todoDiv = document.createElement("div");
   todoDiv.classList.add("todo");
+  todoDiv.style.backgroundColor = getBackgroundColor(todo.getPriority());
 
   let todoTitle = document.createElement("h3");
   todoTitle.innerHTML = todo.getTitle();
@@ -654,7 +693,11 @@ function displayTodo(todo) {
   btn_holder.appendChild(mini_btn);
 
   let completed_btn = document.createElement("button");
-  completed_btn.innerHTML = todo.getCompleteStatus();
+  if(todo.getCompleteStatus()) {
+    completed_btn.innerHTML = "Complete";
+  } else {
+    completed_btn.innerHTML = "Incomplete"
+  }
   completed_btn.setAttribute("type", "button");
   completed_btn.setAttribute("data-todo", todoId);
   completed_btn.setAttribute("data-project", projectId);
@@ -727,7 +770,11 @@ function displayProject(project) {
   btn_holder.appendChild(mini_btn);
 
   let completed_btn = document.createElement("button");
-  completed_btn.innerHTML = project.getCompleteStatus();
+  if(project.getCompleteStatus()) {
+    completed_btn.innerHTML = "Complete";
+  } else {
+    completed_btn.innerHTML = "Incomplete";
+  }
   completed_btn.setAttribute("type", "button");
   completed_btn.setAttribute("data-project", projectId);
   completed_btn.classList.add("project-complete-btn");
@@ -882,6 +929,8 @@ export {
 
   toggleTodo,
   toggleProject,
+  toggleCompleteTodo,
+  toggleCompleteProject,
 
   displayNewTodoForm,
   displayEditTodoForm,

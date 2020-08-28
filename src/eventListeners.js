@@ -96,16 +96,18 @@ function addCompleteEventListeners() {
   for (let j = 0; j < complete_btns.length; j++) {
     let current_btn = complete_btns[j];
     current_btn.addEventListener("click", 
-    function() {
-      toggleCompleteTodo();
+    function(e) {
+      toggleCompleteTodo(e);
+      tabSwitchBoard("persist");
     }, false);
   }
   let proj_complete_btns = document.querySelectorAll(".project-complete-btn");
   for (let j = 0; j < proj_complete_btns.length; j++) {
     let current_btn = proj_complete_btns[j];
     current_btn.addEventListener("click", 
-      function() {
-        toggleCompleteProject();
+      function(e) {
+        toggleCompleteProject(e);
+        tabSwitchBoard("persist");
       }, false);
   }
 }
@@ -135,6 +137,7 @@ function runAllDisplayEventListeners() {
   addDeleteEventListeners();
   addCompleteEventListeners();
   addEditEventListeners();
+
   preventDefault();
 }
 // Form Event Listeners

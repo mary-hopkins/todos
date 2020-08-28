@@ -36,6 +36,7 @@ const Todo = (
     }
   }
   function updateTodoCompleteStatus(boolean) {
+    console.log('update is happening');
     if(completeStatus != boolean) {
       completeStatus = boolean;
     }

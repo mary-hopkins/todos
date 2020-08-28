@@ -1,17 +1,9 @@
-/*
-rewrite ProjectTab
-
-
-*/
-
-
 
 import { loadHomeTab, loadProjectTab } from "./HomeTab.js";
 import { List } from "./ProjectsAndTodos.js";
 import {
   addNavigationEventListeners,
   runAllDisplayEventListeners,
-  testMe,
   addCreateNewEventListeners
 } from "./eventListeners.js";
 import { notAPageReset } from "./DOMfunctions.js"
