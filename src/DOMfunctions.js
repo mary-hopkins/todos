@@ -1,11 +1,5 @@
 
 import {listOne} from "./index.js"
-import {
-  Todo,
-  Project,
-  List
-} from "./ProjectsAndTodos";
-import { runAllDisplayEventListeners, addCreateNewEventListeners } from "./eventListeners.js"
 
 
 // Functions to validate form input
